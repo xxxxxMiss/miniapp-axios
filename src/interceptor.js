@@ -4,20 +4,18 @@ const use = handlers => (resolve, reject) => {
     throw new TypeError(`resolve must be a function, received ${resolve}`)
   }
   if (typeof reject !== 'function') {
-    reject = function() {}
+    reject = function reject() {}
   }
   handlers.push(resolve, reject)
 }
 
-const request = {
-  handlers: [],
-  use: use(request.handlers),
-}
+const request = {}
+request.handlers = []
+request.use = use(request.handlers)
 
-const response = {
-  handlers: [],
-  use: use(response.handlers),
-}
+const response = {}
+response.handlers = []
+response.use = use(response.handlers)
 
 export default {
   request,

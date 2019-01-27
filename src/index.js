@@ -2,17 +2,18 @@ import interceptors from './interceptor'
 import request from './request'
 
 const mpRequest = config => {
-  const handlers = [request, undefined]
+  const handlers = []
   interceptors.request.handlers.forEach(fn => {
-    handlers.unshift(fn)
+    handlers.push(fn)
   })
+  handlers.push(request, undefined)
   interceptors.response.handlers.forEach(fn => {
     handlers.push(fn)
   })
 
   let promise = Promise.resolve(config)
   while (handlers.length) {
-    promise.then(handlers.shift(), handlers.shift())
+    promise = promise.then(handlers.shift(), handlers.shift())
   }
   return promise
 }
@@ -28,7 +29,7 @@ const mpRequest = config => {
   'connect',
 ].forEach(method => {
   mpRequest[method] = (url, config = {}) => {
-    return mpRequest(url, { ...config, method: method.toUpperCase() })
+    return mpRequest({ ...config, url, method: method.toUpperCase() })
   }
 })
 
