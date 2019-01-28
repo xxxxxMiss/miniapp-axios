@@ -17,7 +17,8 @@
     "start": "rollup -c -w",
     "commit": "git-cz",
     "release": "standard-version",
-    "test": "jest"
+    "test": "jest --coverage",
+    "test:watch": "jest --watch"
   },
   "husky": {
     "hooks": {
@@ -72,7 +73,7 @@
     }
   },
   "jest": {
-    "collectCoverage": true,
+    "collectCoverage": false,
     "collectCoverageFrom": [
       "src/**/*.{js,jsx}"
     ],

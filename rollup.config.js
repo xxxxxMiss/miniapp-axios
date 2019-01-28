@@ -23,7 +23,6 @@ export default {
     external(),
     babel({
       exclude: 'node_modules/**',
-      plugins: ['external-helpers'],
     }),
     resolve(),
     commonjs(),

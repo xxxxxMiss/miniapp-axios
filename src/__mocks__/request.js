@@ -1,3 +1,5 @@
+import * as helpers from '../helpers'
+
 const methods = [
   'options',
   'get',
@@ -28,34 +30,53 @@ wx.request = config => {
     fail(new Error('timeout of ' + config.timeout + 'ms exceeded'))
   }
 
-  if (config.method) {
-    config.method = config.method.toUpperCase()
-  }
   Reflect.deleteProperty(config, 'success')
   Reflect.deleteProperty(config, 'fail')
 
+  // TODO: simulate network request
   if (error) {
     fail(error)
   } else {
     success({
-      data: {},
+      data: {}, // response
       statusCode: 200,
       header: {},
-      config,
+      config, // origin config
     })
   }
 }
 
 export default function request(config) {
-  if (typeof config !== 'object') {
-    return Promise.reject(
-      new TypeError(`config must be an object, but got: ${config}`)
-    )
+  let {
+    transformRequest,
+    transformResponse,
+    method,
+    data,
+    params,
+    paramsSerializer,
+    url,
+  } = config
+  if (
+    Array.isArray(transformRequest) &&
+    transformRequest.length &&
+    (method === 'put' || method === 'post')
+  ) {
+    data = transformRequest.reduce((_data, fn) => {
+      return fn(_data, config.headers) || _data
+    }, data)
   }
+
+  config.url = helpers.buildURL(url, params, paramsSerializer)
+  config.method = method.toUpperCase()
+  const wxConfig = helpers.getWxConfig(config)
+
   return new Promise((resolve, reject) => {
     wx.request({
-      ...config,
+      ...wxConfig,
       success: res => {
+        if (Array.isArray(transformResponse) && transformResponse.length) {
+          res = transformResponse.reduce((_res, fn) => fn(_res) || _res, res)
+        }
         resolve(res)
       },
       fail: res => {

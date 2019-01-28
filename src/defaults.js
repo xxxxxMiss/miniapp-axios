@@ -2,12 +2,14 @@ export default {
   url: '',
   baseURL: '',
   method: 'get',
-  transformRequest: [],
-  transformResponse: [],
+  responseType: 'text',
+  dataType: 'json',
+  transformRequest: null,
+  transformResponse: null,
   headers: {
     'content-type': 'application/json',
   },
-  params: {},
+  params: null,
   paramsSerializer: null,
   data: {},
   timeout: 60000, // wx.request default timeout
