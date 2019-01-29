@@ -2,7 +2,7 @@ import mpAxios from '../src'
 
 jest.mock('../src/request')
 
-describe('defaults', () => {
+describe('defaults.baseURL', () => {
   it('baseURL', async () => {
     await expect(
       mpAxios({
@@ -50,6 +50,10 @@ describe('defaults', () => {
 describe('mpAxios.defaults', () => {
   beforeAll(() => {
     mpAxios.defaults.baseURL = 'https://google.com'
+    mpAxios.defaults.headers = {
+      referer: 'https://jestjs.io',
+      'content-type': 'text/html',
+    }
   })
 
   it('mpAxios(config)', async () => {
@@ -83,5 +87,18 @@ describe('mpAxios.defaults', () => {
         url: 'https://google.com/path/yy',
       })
     ).resolves.toHaveProperty('config.url', 'https://google.com/path/yy')
+  })
+
+  it('should delete the forbidden header `referer`', async () => {
+    await expect(
+      mpAxios({
+        url: 'https://jestjs.io',
+      })
+    ).resolves.not.toHaveProperty('config.header.referer')
+    await expect(
+      mpAxios({
+        url: 'https://jestjs.io',
+      })
+    ).resolves.toHaveProperty(['config', 'header', 'content-type'])
   })
 })

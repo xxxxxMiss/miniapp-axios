@@ -77,6 +77,10 @@
     "collectCoverageFrom": [
       "src/**/*.{js,jsx}"
     ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/src/request.js"
+    ],
     "testMatch": [
       "**/__tests__/*.spec.js"
     ],

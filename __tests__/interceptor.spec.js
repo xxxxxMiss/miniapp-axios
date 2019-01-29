@@ -18,6 +18,18 @@ describe('interceptors', () => {
     config = getDefaults()
   })
   describe('request', () => {
+    it('should throw an error when first param is not a function', () => {
+      expect(() => {
+        mpAxios.interceptors.request.use(undefined)
+      }).toThrow(/must be a function/)
+    })
+
+    it('without second param is ok', () => {
+      expect(() => {
+        mpAxios.interceptors.request.use(conf => conf, undefined)
+      }).not.toThrow()
+    })
+
     it('passed the `config` to the interceptor', async () => {
       mpAxios.interceptors.request.use(conf => {
         conf.data.key = 'value'
