@@ -1,6 +1,6 @@
 export const isAbsoluteURL = url => /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url)
 
-export const combineURLs = (baseURL, relativeURL) => {
+export const combineURL = (baseURL, relativeURL) => {
   return relativeURL
     ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
     : baseURL

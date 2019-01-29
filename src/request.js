@@ -9,6 +9,7 @@ export default function request(config) {
     params,
     paramsSerializer,
     url,
+    baseURL,
   } = config
   if (
     Array.isArray(transformRequest) &&
@@ -20,6 +21,7 @@ export default function request(config) {
     }, data)
   }
 
+  url = helpers.isAbsoluteURL(url) ? url : helpers.combineURL(baseURL, url)
   config.url = helpers.buildURL(url, params, paramsSerializer)
   config.method = method.toUpperCase()
   config = helpers.toWxConfig(config)
