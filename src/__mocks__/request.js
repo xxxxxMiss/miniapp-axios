@@ -1,5 +1,11 @@
 import * as helpers from '../helpers'
 
+class RequestTask {
+  abort(callback) {
+    callback && callback()
+  }
+}
+
 const methods = [
   'options',
   'get',
@@ -26,14 +32,11 @@ wx.request = config => {
         config.method
       }, avaliable methods are: ${methods.join(',')}`
     )
-  } else if (config.timeout && config.timeout > 6000) {
-    fail(new Error('timeout of ' + config.timeout + 'ms exceeded'))
   }
 
   Reflect.deleteProperty(config, 'success')
   Reflect.deleteProperty(config, 'fail')
 
-  // TODO: simulate network request
   if (error) {
     fail(error)
   } else {
@@ -44,6 +47,7 @@ wx.request = config => {
       config, // origin config
     })
   }
+  return new RequestTask()
 }
 
 export default function request(config) {
@@ -56,6 +60,7 @@ export default function request(config) {
     paramsSerializer,
     url,
     baseURL,
+    timeout,
   } = config
   if (
     Array.isArray(transformRequest) &&
@@ -70,20 +75,48 @@ export default function request(config) {
   url = helpers.isAbsoluteURL(url) ? url : helpers.combineURL(baseURL, url)
   config.url = helpers.buildURL(url, params, paramsSerializer)
   config.method = method.toUpperCase()
-  const wxConfig = helpers.getWxConfig(config)
+  config = helpers.getWxConfig(config)
 
-  return new Promise((resolve, reject) => {
-    wx.request({
-      ...wxConfig,
-      success: res => {
-        if (Array.isArray(transformResponse) && transformResponse.length) {
-          res = transformResponse.reduce((_res, fn) => fn(_res) || _res, res)
-        }
-        resolve(res)
-      },
-      fail: res => {
-        reject(res)
-      },
+  let requestTask = null
+  const onRequest = () =>
+    new Promise((resolve, reject) => {
+      requestTask = wx.request({
+        ...config,
+        success: res => {
+          if (Array.isArray(transformResponse) && transformResponse.length) {
+            res = transformResponse.reduce((_res, fn) => fn(_res) || _res, res)
+          }
+          // simulate network request
+          if (process.env.timeout === 'on') {
+            setTimeout(resolve, 2000, res)
+          } else {
+            resolve(res)
+          }
+        },
+        fail: res => {
+          if (process.env.timeout === 'on') {
+            setTimeout(reject, 2000, res)
+          } else {
+            reject(res)
+          }
+        },
+      })
     })
+  const onReject = () =>
+    new Promise((_, reject) => {
+      setTimeout(
+        () => reject(new Error('timeout of ' + timeout + 'ms exceeded')),
+        timeout
+      )
+    })
+
+  return Promise.race([onRequest(), onReject()]).catch(e => {
+    if (e instanceof Error) {
+      if (requestTask) {
+        requestTask.abort()
+        e.message = e.message + ' and the request has aborted'
+      }
+    }
+    throw e
   })
 }

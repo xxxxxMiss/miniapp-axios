@@ -26,18 +26,37 @@ export default function request(config) {
   config.method = method.toUpperCase()
   config = helpers.toWxConfig(config)
 
-  return new Promise((resolve, reject) => {
-    wx.request({
-      ...config,
-      success: res => {
-        if (Array.isArray(transformResponse) && transformResponse.length) {
-          res = transformResponse.reduce((_res, fn) => fn(_res) || _res, res)
-        }
-        resolve(res)
-      },
-      fail: res => {
-        reject(res)
-      },
+  let requestTask = null
+  const onRequest = () =>
+    new Promise((resolve, reject) => {
+      requestTask = wx.request({
+        ...config,
+        success: res => {
+          if (Array.isArray(transformResponse) && transformResponse.length) {
+            res = transformResponse.reduce((_res, fn) => fn(_res) || _res, res)
+          }
+          resolve(res)
+        },
+        fail: res => {
+          reject(res)
+        },
+      })
     })
+  const onReject = () =>
+    new Promise((_, reject) => {
+      setTimeout(
+        () => reject(new Error('timeout of ' + config.timeout + 'ms exceeded')),
+        config.timeout
+      )
+    })
+
+  return Promise.race([onRequest(), onReject()]).catch(e => {
+    if (e instanceof Error) {
+      if (requestTask) {
+        requestTask.abort()
+        e.message = e.message + ' and the request has aborted'
+      }
+    }
+    throw e
   })
 }

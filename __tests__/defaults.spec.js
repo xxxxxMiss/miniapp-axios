@@ -1,5 +1,7 @@
 import mpAxios from '../src'
 
+process.env.timeout = 'on'
+jest.setTimeout(60000)
 jest.mock('../src/request')
 
 describe('defaults.baseURL', () => {
@@ -44,6 +46,35 @@ describe('defaults.baseURL', () => {
         baseURL: 'https://jestjs.io',
       })
     ).resolves.toHaveProperty('config.url', '//path/foo')
+  })
+})
+
+describe('defaults.timeout', () => {
+  it('should throw error when timeout', async () => {
+    await expect(
+      mpAxios({
+        url: 'https://jestjs.io',
+        timeout: 1000,
+      })
+    ).rejects.toThrow(/timeout of/)
+  })
+
+  it('should throw error when timeout', async () => {
+    await expect(
+      mpAxios({
+        url: 'https://jestjs.io',
+        timeout: 1000,
+      })
+    ).rejects.toThrow(/timeout of/)
+  })
+
+  it('automatically cancel request when timeout', async () => {
+    await expect(
+      mpAxios({
+        url: 'https://jestjs.io',
+        timeout: 500,
+      })
+    ).rejects.toThrow(/has aborted/)
   })
 })
 

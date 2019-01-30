@@ -1,6 +1,6 @@
 import mpAxios from '../src'
 
-jest.useFakeTimers()
+process.env.timeout = 'off'
 jest.mock('../src/request.js')
 
 describe('interceptors', () => {
