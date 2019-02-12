@@ -30,7 +30,7 @@ export default function request(config) {
   url = helpers.isAbsoluteURL(url) ? url : helpers.combineURL(baseURL, url)
   config.url = helpers.buildURL(url, params, paramsSerializer)
   config.method = method.toUpperCase()
-  config = helpers.toWxConfig(config)
+  config = helpers.getWxConfig(config)
 
   let requestTask = null
   const onRequest = () =>

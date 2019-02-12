@@ -182,10 +182,6 @@ These are the available config options for making requests. Only the `url` is re
   // How many times to retry request when timeout
   retry: 0, // default
 
-  // `withCredentials` indicates whether or not cross-site Access-Control requests
-  // should be made using credentials
-  withCredentials: true, // default
-
   // About the two options, see:
   // https://developers.weixin.qq.com/miniprogram/dev/api/wx.request.html
   responseType: 'text',
@@ -239,6 +235,10 @@ mpAxios.interceptors.response.use(
   }
 )
 ```
+
+## Cookie
+
+> If you have some requirements about cookies?you can combine the module with [weapp-cookie](https://github.com/charleslo1/weapp-cookie).
 
 ## License
 

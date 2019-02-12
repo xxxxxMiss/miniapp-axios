@@ -16,7 +16,7 @@
     "build": "rollup -c",
     "start": "rollup -c -w",
     "commit": "git-cz",
-    "release": "standard-version",
+    "release": "yarn build && standard-version",
     "test": "jest --coverage",
     "test:watch": "jest --watch"
   },
