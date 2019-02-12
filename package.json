@@ -1,6 +1,6 @@
 {
   "name": "miniapp-axios",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "An encapsulation of miniapp request and using the similar api as axios",
   "author": "TOC-TEAM",
   "license": "MIT",
