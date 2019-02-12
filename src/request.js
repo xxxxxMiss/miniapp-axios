@@ -1,6 +1,11 @@
 import * as helpers from './helpers'
 
+let retry = 0
 export default function request(config) {
+  // TODO: keep origin config
+  if (!retry && config.retry !== undefined) {
+    retry = config.retry
+  }
   let {
     transformRequest,
     transformResponse,
@@ -11,12 +16,13 @@ export default function request(config) {
     url,
     baseURL,
   } = config
+
   if (
     Array.isArray(transformRequest) &&
     transformRequest.length &&
     (method === 'put' || method === 'post')
   ) {
-    data = transformRequest.reduce((_data, fn) => {
+    config.data = transformRequest.reduce((_data, fn) => {
       return fn(_data, config.headers) || _data
     }, data)
   }
@@ -51,10 +57,14 @@ export default function request(config) {
     })
 
   return Promise.race([onRequest(), onReject()]).catch(e => {
-    if (e instanceof Error) {
+    if (e instanceof Error && e.message.includes('timeout of')) {
       if (requestTask) {
         requestTask.abort()
         e.message = e.message + ' and the request has aborted'
+
+        if (retry > 0 && retry--) {
+          return request(config)
+        }
       }
     }
     throw e

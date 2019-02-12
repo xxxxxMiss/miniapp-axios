@@ -55,7 +55,7 @@ export const getWxConfig = obj => {
       result[key] = obj[key]
     }
   })
-  const headers = obj.headers
+  const headers = obj.headers || obj.header
   if (headers.referer) {
     Reflect.deleteProperty(headers, 'referer')
   }

@@ -54,16 +54,7 @@ describe('defaults.timeout', () => {
     await expect(
       mpAxios({
         url: 'https://jestjs.io',
-        timeout: 1000,
-      })
-    ).rejects.toThrow(/timeout of/)
-  })
-
-  it('should throw error when timeout', async () => {
-    await expect(
-      mpAxios({
-        url: 'https://jestjs.io',
-        timeout: 1000,
+        timeout: 500,
       })
     ).rejects.toThrow(/timeout of/)
   })
@@ -78,7 +69,7 @@ describe('defaults.timeout', () => {
   })
 })
 
-describe('mpAxios.defaults', () => {
+describe('set global config: mpAxios.defaults', () => {
   beforeAll(() => {
     mpAxios.defaults.baseURL = 'https://google.com'
     mpAxios.defaults.headers = {
@@ -131,5 +122,48 @@ describe('mpAxios.defaults', () => {
         url: 'https://jestjs.io',
       })
     ).resolves.toHaveProperty(['config', 'header', 'content-type'])
+  })
+
+  it('should delete the forbidden header `Referer`', async () => {
+    mpAxios.defaults.headers = {
+      Referer: 'https://jestjs.io',
+      'content-type': 'text/html',
+    }
+    await expect(
+      mpAxios({
+        url: 'https://jestjs.io',
+      })
+    ).resolves.not.toHaveProperty('config.header.Referer')
+  })
+
+  it('set global transformRequest', async () => {
+    mpAxios.defaults.transformRequest = [
+      data => {
+        data.name = 'transformRequest'
+      },
+    ]
+    await expect(
+      mpAxios.post('https://google.com', {
+        name: 'test',
+      })
+    ).resolves.toHaveProperty('config.data.name', 'transformRequest')
+  })
+
+  it('set global transformResponse', async () => {
+    mpAxios.defaults.transformResponse = [
+      data => {
+        data.name = 'transformResponse'
+      },
+    ]
+    await expect(mpAxios.get('https://google.com')).resolves.toHaveProperty(
+      'name',
+      'transformResponse'
+    )
+  })
+
+  it('defaults.retry', async () => {
+    mpAxios.defaults.retry = 2
+    mpAxios.defaults.timeout = 1000
+    await expect(mpAxios.get('https://jestjs.io')).rejects.toThrow(/0$/)
   })
 })

@@ -1,7 +1,8 @@
-// axios.interceptors.request.use(resolve, reject)
 const use = handlers => (resolve, reject) => {
   if (typeof resolve !== 'function') {
-    throw new TypeError(`resolve must be a function, received ${resolve}`)
+    throw new TypeError(
+      `first argument must be a function, but received: ${resolve}`
+    )
   }
   if (typeof reject !== 'function') {
     reject = function reject() {}

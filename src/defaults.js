@@ -13,4 +13,5 @@ export default {
   paramsSerializer: null,
   data: {},
   timeout: 60000, // wx.request default timeout
+  retry: 0,
 }

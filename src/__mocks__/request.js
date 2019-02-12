@@ -50,7 +50,11 @@ wx.request = config => {
   return new RequestTask()
 }
 
+let retry = 0
 export default function request(config) {
+  if (!retry && config.retry !== undefined) {
+    retry = config.retry
+  }
   let {
     transformRequest,
     transformResponse,
@@ -67,7 +71,7 @@ export default function request(config) {
     transformRequest.length &&
     (method === 'put' || method === 'post')
   ) {
-    data = transformRequest.reduce((_data, fn) => {
+    config.data = transformRequest.reduce((_data, fn) => {
       return fn(_data, config.headers) || _data
     }, data)
   }
@@ -88,7 +92,7 @@ export default function request(config) {
           }
           // simulate network request
           if (process.env.timeout === 'on') {
-            setTimeout(resolve, 2000, res)
+            setTimeout(resolve, process.env.resolveTime || 2000, res)
           } else {
             resolve(res)
           }
@@ -111,10 +115,16 @@ export default function request(config) {
     })
 
   return Promise.race([onRequest(), onReject()]).catch(e => {
-    if (e instanceof Error) {
+    if (e instanceof Error && e.message.includes('timeout of')) {
       if (requestTask) {
         requestTask.abort()
-        e.message = e.message + ' and the request has aborted'
+        e.message = e.message + ' and the request has aborted ' + retry
+
+        if (retry > 0 && retry--) {
+          // for testing
+          e.message = e.message.replace(/\d+$/g, retry)
+          return request(config)
+        }
       }
     }
     throw e
