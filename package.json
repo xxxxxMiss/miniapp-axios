@@ -64,8 +64,18 @@
     "standard-version": "^4.4.0"
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
+  ],
+  "keywords": [
+    "axios",
+    "request",
+    "fetch",
+    "http",
+    "https",
+    "ajax",
+    "miniapp",
+    "wexin",
+    "wechat"
   ],
   "config": {
     "commitizen": {
