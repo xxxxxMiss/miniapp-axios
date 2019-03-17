@@ -1,7 +1,8 @@
 import * as helpers from './helpers'
+import { RequestConfig } from './types'
 
 let retry = 0
-export default function request(config) {
+export default function request(config: RequestConfig) {
   // TODO: keep origin config
   if (!retry && config.retry !== undefined) {
     retry = config.retry

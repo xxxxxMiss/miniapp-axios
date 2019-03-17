@@ -2,7 +2,9 @@ import interceptors from './interceptor'
 import request from './request'
 import defaults from './defaults'
 
-const mpRequest = config => {
+import { RequestConfig } from './types'
+
+const mpRequest = (config: RequestConfig) => {
   if (typeof config === 'string') {
     config = { url: config }
   }
