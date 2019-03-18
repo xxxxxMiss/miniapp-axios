@@ -4,14 +4,24 @@ export interface RequestConfig {
   method?: string
   responseType?: string
   dataType?: string
-  transformRequest?: Array<(data: object, headers: object) => object | void>
-  transformResponse?: Array<(response: object) => object | void>
+  transformRequest?: Array<
+    (data: object, headers: object) => object | void
+  > | null
+  transformResponse?: Array<(response: object) => object | void> | null
   headers?: object
-  params?: object
-  paramsSerializer?: (args: object) => string
+  params?: object | null
+  paramsSerializer?: ((args: object) => string) | null
   data?: object
   timeout?: number
   retry?: number
+}
+
+export interface Response {
+  status: number
+  statusText: string
+  data: string | object | ArrayBuffer
+  headers: object
+  config: RequestConfig
 }
 
 export type Resolve<T> = (config: T) => T | Promise<T>
@@ -26,5 +36,21 @@ export interface Interceptor<T> {
 }
 
 export interface MpRequest {
+  (config: RequestConfig): Promise<Response>
 
+  interceptors: {
+    request: Interceptor<RequestConfig>
+    response: Interceptor<Response>
+  }
+  defaults: RequestConfig
+
+  options<T = any>(url: string, config?: object): Promise<T>
+  get<T = any>(url: string, config?: object): Promise<T>
+  head<T = any>(url: string, config?: object): Promise<T>
+  delete<T = any>(url: string, config?: object): Promise<T>
+  trace<T = any>(url: string, config?: object): Promise<T>
+  connect<T = any>(url: string, config?: object): Promise<T>
+
+  post<T = any>(url: string, data: object, config: object): Promise<T>
+  put<T = any>(url: string, data: object, config: object): Promise<T>
 }

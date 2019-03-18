@@ -1,8 +1,10 @@
 import * as helpers from './helpers'
-import { RequestConfig } from './types'
+import { RequestConfig, Response } from './types'
 
 let retry = 0
-export default function request(config: RequestConfig) {
+export default function request(
+  config: RequestConfig
+): Promise<Response | Error> {
   // TODO: keep origin config
   if (!retry && config.retry !== undefined) {
     retry = config.retry
@@ -10,8 +12,8 @@ export default function request(config: RequestConfig) {
   let {
     transformRequest,
     transformResponse,
-    method,
-    data,
+    method = 'get',
+    data = {},
     params,
     paramsSerializer,
     url,
@@ -24,7 +26,7 @@ export default function request(config: RequestConfig) {
     (method === 'put' || method === 'post')
   ) {
     config.data = transformRequest.reduce((_data, fn) => {
-      return fn(_data, config.headers) || _data
+      return fn(_data, config.headers || {}) || _data
     }, data)
   }
 
@@ -36,6 +38,7 @@ export default function request(config: RequestConfig) {
   let requestTask = null
   const onRequest = () =>
     new Promise((resolve, reject) => {
+      // TODO: how to type a global variable?
       requestTask = wx.request({
         ...config,
         success: res => {

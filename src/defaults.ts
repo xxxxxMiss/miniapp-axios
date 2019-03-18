@@ -1,4 +1,6 @@
-export default {
+import { RequestConfig } from './types'
+
+const defaults: RequestConfig = {
   url: '',
   baseURL: '',
   method: 'get',
@@ -15,3 +17,5 @@ export default {
   timeout: 60000, // wx.request default timeout
   retry: 0,
 }
+
+export default defaults
