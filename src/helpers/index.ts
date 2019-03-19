@@ -1,12 +1,19 @@
-export const isAbsoluteURL = url => /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url)
+import { RequestConfig } from '../types'
 
-export const combineURL = (baseURL, relativeURL) => {
+export const isAbsoluteURL = (url: string) =>
+  /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url)
+
+export const combineURL = (baseURL: string, relativeURL?: string) => {
   return relativeURL
     ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
     : baseURL
 }
 
-export const buildURL = (url, params, paramsSerializer) => {
+export const buildURL = (
+  url: string,
+  params?: RequestConfig['params'],
+  paramsSerializer?: RequestConfig['paramsSerializer']
+) => {
   if (!params) {
     return url
   }
@@ -15,9 +22,9 @@ export const buildURL = (url, params, paramsSerializer) => {
   if (paramsSerializer) {
     serializedParams = paramsSerializer(params)
   } else {
-    let parts = []
+    let parts: string[] = []
 
-    forEach(params, function serialize(val, key) {
+    forEach(params, function serialize(val: any, key: string) {
       if (val === null || typeof val === 'undefined') {
         return
       }
@@ -48,7 +55,7 @@ export const buildURL = (url, params, paramsSerializer) => {
   return url
 }
 
-export const getWxConfig = obj => {
+export const getWxConfig = (obj: any) => {
   const result = {}
   ;['url', 'data', 'method', 'dataType', 'responseType'].forEach(key => {
     if (obj[key]) {
@@ -66,7 +73,7 @@ export const getWxConfig = obj => {
   return result
 }
 
-function encode(val) {
+function encode(val: string) {
   return encodeURIComponent(val)
     .replace(/%40/gi, '@')
     .replace(/%3A/gi, ':')
@@ -77,7 +84,7 @@ function encode(val) {
     .replace(/%5D/gi, ']')
 }
 
-function forEach(obj, fn) {
+function forEach(obj: any, fn: () => void) {
   if (obj === null || typeof obj === 'undefined') {
     return
   }
@@ -99,10 +106,10 @@ function forEach(obj, fn) {
   }
 }
 
-function isDate(val) {
+function isDate(val: any) {
   return Object.prototype.toString.call(val) === '[object Date]'
 }
 
-function isObject(val) {
+function isObject(val: any) {
   return val !== null && typeof val === 'object'
 }
