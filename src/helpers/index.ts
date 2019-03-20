@@ -3,7 +3,7 @@ import { RequestConfig } from '../types'
 export const isAbsoluteURL = (url: string) =>
   /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url)
 
-export const combineURL = (baseURL: string, relativeURL?: string) => {
+export const combineURL = (baseURL = '', relativeURL?: string) => {
   return relativeURL
     ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
     : baseURL

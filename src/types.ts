@@ -16,6 +16,24 @@ export interface RequestConfig {
   retry?: number
 }
 
+export interface WxConfig {
+  url: string
+  data?: string | object | ArrayBuffer
+  header?: object
+  method: string
+  dataType: string
+  responseType: string
+  success?(res: WxResponse): void
+  fail?(res: WxResponse): void
+  complete?(res: WxResponse): void
+}
+
+export interface WxResponse {
+  data: string | object | ArrayBuffer
+  statusCode: number
+  header: object
+}
+
 export interface Response {
   status: number
   statusText: string
