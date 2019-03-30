@@ -1,10 +1,10 @@
 import * as helpers from './helpers'
-import { RequestConfig, Response } from './types'
+import { RequestConfig, Response, RequestTask, WxResponse } from './types'
 
 let retry = 0
 export default function request(
   config: RequestConfig
-): Promise<Response | Error> {
+): Promise<{} | Response | Error> {
   // TODO: keep origin config
   if (!retry && config.retry !== undefined) {
     retry = config.retry
@@ -35,19 +35,21 @@ export default function request(
   config.method = method.toUpperCase()
   config = helpers.getWxConfig(config)
 
-  let requestTask = null
+  let requestTask: RequestTask = {}
   const onRequest = () =>
     new Promise((resolve, reject) => {
       // TODO: how to type a global variable?
       requestTask = wx.request({
         ...config,
-        success: res => {
+        success: (res: WxResponse) => {
           if (Array.isArray(transformResponse) && transformResponse.length) {
-            res = transformResponse.reduce((_res, fn) => fn(_res) || _res, res)
+            res = <WxResponse>(
+              transformResponse.reduce((_res, fn) => fn(_res) || _res, res)
+            )
           }
           resolve(res)
         },
-        fail: res => {
+        fail: (res: WxResponse) => {
           reject(res)
         },
       })
@@ -62,7 +64,7 @@ export default function request(
 
   return Promise.race([onRequest(), onReject()]).catch(e => {
     if (e instanceof Error && e.message.includes('timeout of')) {
-      if (requestTask) {
+      if (requestTask && requestTask.abort) {
         requestTask.abort()
         e.message = e.message + ' and the request has aborted'
 

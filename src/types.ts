@@ -1,5 +1,5 @@
 export interface RequestConfig {
-  url: string
+  url?: string
   baseURL?: string
   method?: string
   responseType?: string
@@ -42,6 +42,12 @@ export interface Response {
   config: RequestConfig
 }
 
+export interface RequestTask<T = any> {
+  abort?(): void
+  offHeadersReceived?(callback: (arg: T) => void): void
+  onHeadersReceived?(callback: (arg: T) => void): void
+}
+
 export type Resolve<T> = (config: T) => T | Promise<T>
 
 export type Reject = ((error: any) => void) | undefined
@@ -49,7 +55,7 @@ export type Reject = ((error: any) => void) | undefined
 export type Handlers<T> = Array<(arg: T | any) => T | Promise<T> | any>
 
 export interface Interceptor<T> {
-  use: (resolve: Resolve<T>, reject: Reject) => void
+  use: (resolve: Resolve<T>, reject?: Reject) => void
   handlers: Handlers<T>
 }
 

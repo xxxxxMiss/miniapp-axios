@@ -2,7 +2,7 @@ import { Interceptor, Handlers, Resolve, Reject, RequestConfig } from './types'
 
 const use = (handlers: Handlers<RequestConfig>) => (
   resolve: Resolve<RequestConfig>,
-  reject: Reject
+  reject?: Reject
 ) => {
   if (typeof resolve !== 'function') {
     throw new TypeError(

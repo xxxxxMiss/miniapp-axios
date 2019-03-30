@@ -104,7 +104,7 @@
     "preset": "ts-jest",
     "globals": {
       "ts-jest": {
-        "tsConfigFile": "tsconfig.test.json"
+        "tsConfig": "__tests__/tsconfig.json"
       }
     },
     "verbose": true

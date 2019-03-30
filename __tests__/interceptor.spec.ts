@@ -1,4 +1,5 @@
 import mpAxios from '../src'
+import { RequestConfig } from '../src/types'
 
 process.env.timeout = 'off'
 jest.mock('../src/request.js')
@@ -13,13 +14,14 @@ describe('interceptors', () => {
       },
     }
   }
-  let config = null
+  let config: RequestConfig = {}
   beforeEach(() => {
     config = getDefaults()
   })
   describe('request', () => {
     it('should throw an error when first param is not a function', () => {
       expect(() => {
+        // TODO: how to express a explicit error?
         mpAxios.interceptors.request.use(undefined)
       }).toThrow(/must be a function/)
     })
